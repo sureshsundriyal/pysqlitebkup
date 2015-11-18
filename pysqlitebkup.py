@@ -13,7 +13,6 @@ SQLITE_OK = 0
 SQLITE_ERROR = 1
 SQLITE_BUSY = 5
 SQLITE_LOCKED = 6
-SQLITE_DONE = 101
 
 SQLITE_OPEN_READONLY = 1
 SQLITE_OPEN_READWRITE = 2
@@ -54,17 +53,20 @@ class dbbackup(object):
 
     def backupInit(self):
 
-        files = { self.src : (self.p_src_db, SQLITE_OPEN_READONLY),
-                  self.dst : (self.p_dst_db,
-                              SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE) }
-
-        for fileName, ptrMode  in list(files.items()):
-            fileName = ctypes.c_char_p(fileName.encode('utf-8'))
-            rc = sqlite.sqlite3_open_v2(fileName, ctypes.byref(ptrMode[0]),
-                                    ptrMode[1], None)
-            if (rc != SQLITE_OK or ptrMode[0].value is None):
+        def __openFiles(fileName, ptr, mode):
+            fileName_p = ctypes.c_char_p(fileName.encode('utf-8'))
+            rc = sqlite.sqlite3_open_v2(fileName_p, ctypes.byref(ptr),
+                                    mode, None)
+            if (rc != SQLITE_OK or ptr.value is None):
                 raise FileOpenException("Unable to open file(%s), rc(%s)" % (
                                         fileName, rc))
+
+        # We do this for the side-effect of opening both the files and not
+        # having boilerplate code and the fact that list comprehensions are
+        # generally faster than a for loop.
+        [ __openFiles(fileName, ptr, mode) for fileName, ptr, mode in
+                [(self.src, self.p_src_db, SQLITE_OPEN_READONLY),
+                 (self.dst, self.p_dst_db, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE)]]
 
         dbType = 'main'.encode('utf-8')
         self.p_backup = ctypes.c_void_p(sqlite.sqlite3_backup_init(
