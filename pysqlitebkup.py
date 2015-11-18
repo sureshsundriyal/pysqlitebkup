@@ -4,10 +4,10 @@ import ctypes
 from ctypes.util import find_library
 
 __author__ = 'Suresh Sundriyal'
-__copyright__ = 'Copyright (c) 2015, Suresh Sundriyal'
-__license__ = 'ISC License (ISC)'
+__license__ = 'CC0 - No rights reserved.'
 __version__ = '0.0.1'
-__credits__ = [ 'Joongi Kim (achimnol)' ]
+__credits__ = [ 'Joongi Kim (achimnol): https://gist.github.com/achimnol/3021995',
+                'sqlite3.org: http://www.sqlite.org/backup.html' ]
 
 SQLITE_OK = 0
 SQLITE_ERROR = 1
