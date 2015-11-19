@@ -13,6 +13,7 @@ SQLITE_OK = 0
 SQLITE_ERROR = 1
 SQLITE_BUSY = 5
 SQLITE_LOCKED = 6
+SQLITE_DONE = 101
 
 SQLITE_OPEN_READONLY = 1
 SQLITE_OPEN_READWRITE = 2
@@ -99,7 +100,7 @@ class dbbackup(object):
         self.remaining = sqlite.sqlite3_backup_remaining(self.p_backup)
         self.pagecount = sqlite.sqlite3_backup_pagecount(self.p_backup)
 
-        if self.remaining == 0:
+        if rc == SQLITE_DONE:
             self.finished = True
 
         if rc in (SQLITE_OK, SQLITE_BUSY, SQLITE_LOCKED):
