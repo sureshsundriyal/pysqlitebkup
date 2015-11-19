@@ -107,12 +107,28 @@ class dbbackup(object):
             # sleep for 250 ms before continuing.
             sqlite.sqlite3_sleep(250)
 
+    def backup(self, stepSize=5):
+        import os
+
+        __unlink = True
+        if os.path.exists(self.dst):
+            __unlink = False
+        try:
+            while not p.finished:
+                p.step(stepSize)
+        except:
+            if __unlink:
+                try:
+                    os.unlink(self.dst)
+                except OSError as e:
+                    pass
+            raise
+
 if __name__ == '__main__':
     import sys
     import logging
     try:
         with dbbackup(sys.argv[1], sys.argv[2]) as p:
-            while not p.finished:
-                p.step(20)
+            p.backup(20)
     except:
         logging.exception("Failed to backup sqlite db")
