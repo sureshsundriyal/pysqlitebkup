@@ -114,8 +114,8 @@ class dbbackup(object):
         if os.path.exists(self.dst):
             __unlink = False
         try:
-            while not p.finished:
-                p.step(stepSize)
+            while not self.finished:
+                self.step(stepSize)
         except:
             if __unlink:
                 try:
