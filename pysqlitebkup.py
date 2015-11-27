@@ -22,26 +22,26 @@ SQLITE_OPEN_CREATE = 4
 sqlite = ctypes.CDLL(find_library('sqlite3'))
 sqlite.sqlite3_backup_init.restype = ctypes.c_void_p
 
+class BackupInitError(Exception):
+    pass
+
+class BackupFailedError(Exception):
+    pass
+
+class FileOpenError(Exception):
+    pass
+
+class UninitializedError(Exception):
+    pass
+
 def _openFile(fileAttributes):
     fileName, ptr, mode = fileAttributes
     fileName_p = ctypes.c_char_p(fileName.encode('utf-8'))
     rc = sqlite.sqlite3_open_v2(fileName_p, ctypes.byref(ptr),
                             mode, None)
     if (rc != SQLITE_OK or ptr.value is None):
-        raise FileOpenException("Unable to open file(%s), rc(%s)" % (
+        raise FileOpenError("Unable to open file(%s), rc(%s)" % (
                                 fileName, rc))
-
-class BackupInitException(Exception):
-    pass
-
-class BackupFailedException(Exception):
-    pass
-
-class FileOpenException(Exception):
-    pass
-
-class UninitializedException(Exception):
-    pass
 
 class dbbackup(object):
     def __init__(self, src, dst):
@@ -75,7 +75,7 @@ class dbbackup(object):
                                                    self.p_dst_db, dbType,
                                                    self.p_src_db, dbType))
         if self.p_backup.value is None:
-            raise BackupInitException("Failed to backup_init")
+            raise BackupInitError("Failed to backup_init")
 
     def backupFinish(self):
 
@@ -90,11 +90,11 @@ class dbbackup(object):
             sqlite.sqlite3_close(self.p_src_db)
 
         if rc != SQLITE_OK:
-            raise BackupFailedException("Failed to backup db: rc(%s)" % rc)
+            raise BackupFailedError("Failed to backup db: rc(%s)" % rc)
 
     def step(self, size=5):
         if self.p_backup.value is None:
-            raise UninitializedException(
+            raise UninitializedError(
                     "step called without calling backupInit first")
 
         rc = sqlite.sqlite3_backup_step(self.p_backup, size)
