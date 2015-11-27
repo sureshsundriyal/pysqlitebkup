@@ -9,4 +9,11 @@ setup(name='pysqlitebkup',
       license="CC0 - No rights reserved.",
       description=('A pure python library that exposes the online sqlite3 '
                    'backup functions.'),
+      classifiers=[
+          'Topic :: Database',
+          'Development Status :: 4 - Beta',
+          'Programming Language :: Python :: 2',
+          'Programming Language :: Python :: 3',
+          'License :: CC0 1.0 Universal (CC0 1.0) Public Domain Dedication',
+          ],
       )
